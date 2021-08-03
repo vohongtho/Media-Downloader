@@ -362,10 +362,11 @@ router.post("/tiktok", async (req, res) => {
       res.json(value);
       res.end();
     })
-    .catch(() => {
+    .catch((err) => {
       res.json({
         status: "error",
         details: "Failed, Please check the URL!",
+        err
       });
       res.end();
     });
