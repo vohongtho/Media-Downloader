@@ -1,5 +1,5 @@
 const request = require("request");
-const axios = require('axios');
+const axios = require("axios");
 
 const router = require("express").Router();
 const youtubeDl = require("youtube-dl");
@@ -22,13 +22,13 @@ router.post("/instagram", (req, res) => {
 
   const url = `https://www.instagram.com/p/${ig_code}/?__a=1`;
 
-  request(url, { json: true ,url},(err, response, body) => {
+  request(url, { json: true, url }, (err, response, body) => {
     if (err) {
       res.json({ status: "error", details: "Error on getting response" });
 
       res.end();
     } else {
-		console.log(response);
+      console.log(response);
       let json = JSON.parse(response.body);
 
       if (json.hasOwnProperty("graphql")) {
@@ -305,22 +305,39 @@ router.post("/youtube-playlist", (req, res) => {
 
 router.post("/tiktok", async (req, res) => {
   const url = req.body.url;
-  try {
-    tiktokScraper
-      .getVideoMeta(url).then(res1=> {
-        
-        console.log(res1);
-        res.json(res1);
-      })
-  } catch (error) {
-         res.json({
-        status: "error",
-        details: "Failed, Please check the URL!",
-        error
-      });
-      res.end();
-  }
-  
+
+  var somevar = false;
+  var PTest = function () {
+    return new Promise(function (resolve, reject) {
+       resolve(11);
+       reject();
+    });
+  };
+  var myfunc = PTest();
+  myfunc
+    .then(function (result) {
+      res.json(result);
+      console.log("Promise Resolved");
+    })
+    .catch(function () {
+      console.log("Promise Rejected");
+    });
+  // try {
+  //   tiktokScraper
+  //     .getVideoMeta(url).then(res1=> {
+
+  //       console.log(res1);
+  //       res.json(res1);
+  //     })
+  // } catch (error) {
+  //        res.json({
+  //       status: "error",
+  //       details: "Failed, Please check the URL!",
+  //       error
+  //     });
+  //     res.end();
+  // }
+
   // let resss = new Promise((resolve, reject) => {
   //   tiktokScraper
   //     .getVideoMeta(url)
@@ -484,6 +501,5 @@ router.post("/dailymotion", (req, res) => {
     }
   });
 });
-
 
 module.exports = router;
