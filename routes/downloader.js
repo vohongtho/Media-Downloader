@@ -309,8 +309,14 @@ router.post("/tiktok", async (req, res) => {
   var somevar = false;
   var PTest = function () {
     return new Promise(function (resolve, reject) {
-       resolve(11);
-       reject();
+
+          tiktokScraper
+      .getVideoMeta(url).then(res1=> {
+
+        resolve(11);
+      }).catch(err=> {reject(err);})
+    
+       
     });
   };
   var myfunc = PTest();
