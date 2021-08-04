@@ -305,12 +305,22 @@ router.post("/youtube-playlist", (req, res) => {
 
 router.post("/tiktok", async (req, res) => {
   const url = req.body.url;
-  tiktokScraper
+  try {
+    tiktokScraper
       .getVideoMeta(url).then(res1=> {
         
         console.log(res1);
         res.json(res1);
       })
+  } catch (error) {
+         res.json({
+        status: "error",
+        details: "Failed, Please check the URL!",
+        error
+      });
+      res.end();
+  }
+  
   // let resss = new Promise((resolve, reject) => {
   //   tiktokScraper
   //     .getVideoMeta(url)
