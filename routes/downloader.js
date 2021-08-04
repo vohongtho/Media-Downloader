@@ -303,79 +303,85 @@ router.post("/youtube-playlist", (req, res) => {
   });
 });
 
-router.post("/tiktok",  (req, res) => {
+router.post("/tiktok", async (req, res) => {
   const url = req.body.url;
-  let resss = new Promise((resolve, reject) => {
-    tiktokScraper
-      .getVideoMeta(url)
-      .then((response) => {
-        // Store the headers for downloading the video
-        const { headers, collector } = response;
-
-        const {
-          authorMeta,
-          text: description,
-          imageUrl: thumbnail,
-          videoUrl: urlDownload,
-          videoMeta,
-        } = collector[0];
-        const {
-          name: username,
-          nickName: name,
-          avatar: profilePic,
-        } = authorMeta;
-
-        const { ratio: format } = videoMeta;
-
-        let returnInfo = {
-          status: "success",
-          headers,
-          username,
-          name,
-          profilePic,
-          description,
-          thumbnail,
-          format,
-          urlDownload,
-        };
-        // Resolve the promise with the information
-        resolve(returnInfo);
-
-        //   // Store data about the video
-        //   returnInfo = response.collector[0];
-        //   returnInfo.videoPath = path.join(basePath, `${videoID}.mp4`);
-
-        //   // Shorten the numbers
-        //   returnInfo.playCount = shortNum(returnInfo.playCount);
-        //   returnInfo.diggCount = shortNum(returnInfo.diggCount);
-        //   returnInfo.shareCount = shortNum(returnInfo.shareCount);
-        //   returnInfo.commentCount = shortNum(returnInfo.commentCount);
-
-        // log.info('📲 - Downloading...', { serverID: guildID })
+  tiktokScraper
+      .getVideoMeta(url).then(res1=> {
+        
+        console.log(res1);
+        res.json(res1);
       })
-      .catch((err) => {
-        // Reject with the
-        res.json({
-          status: "error",
-          details: "Failed, Please check the URL!",
-          err
-        });
-        res.end();
-        reject(err);
-      });
-  })
-    .then((value) => {
-      res.json(value);
-      res.end();
-    })
-    .catch((err) => {
-      res.json({
-        status: "error",
-        details: "Failed, Please check the URL!",
-        err
-      });
-      res.end();
-    });
+  // let resss = new Promise((resolve, reject) => {
+  //   tiktokScraper
+  //     .getVideoMeta(url)
+  //     .then((response) => {
+  //       // Store the headers for downloading the video
+  //       const { headers, collector } = response;
+
+  //       const {
+  //         authorMeta,
+  //         text: description,
+  //         imageUrl: thumbnail,
+  //         videoUrl: urlDownload,
+  //         videoMeta,
+  //       } = collector[0];
+  //       const {
+  //         name: username,
+  //         nickName: name,
+  //         avatar: profilePic,
+  //       } = authorMeta;
+
+  //       const { ratio: format } = videoMeta;
+
+  //       let returnInfo = {
+  //         status: "success",
+  //         headers,
+  //         username,
+  //         name,
+  //         profilePic,
+  //         description,
+  //         thumbnail,
+  //         format,
+  //         urlDownload,
+  //       };
+  //       // Resolve the promise with the information
+  //       resolve(returnInfo);
+
+  //       //   // Store data about the video
+  //       //   returnInfo = response.collector[0];
+  //       //   returnInfo.videoPath = path.join(basePath, `${videoID}.mp4`);
+
+  //       //   // Shorten the numbers
+  //       //   returnInfo.playCount = shortNum(returnInfo.playCount);
+  //       //   returnInfo.diggCount = shortNum(returnInfo.diggCount);
+  //       //   returnInfo.shareCount = shortNum(returnInfo.shareCount);
+  //       //   returnInfo.commentCount = shortNum(returnInfo.commentCount);
+
+  //       // log.info('📲 - Downloading...', { serverID: guildID })
+  //     })
+  //     .catch((err) => {
+  //       // Reject with the
+  //       res.json({
+  //         status: "error",
+  //         details: "Failed, Please check the URL!",
+  //         err
+  //       });
+  //       res.end();
+  //       reject(err);
+  //     });
+  // })
+  //   .then((value) => {
+  //     res.json(value);
+  //     res.end();
+  //   })
+  //   .catch((err) => {
+  //     res.json({
+  //       status: "error",
+  //       details: "Failed, Please check the URL!",
+  //       err
+  //     });
+  //     res.end();
+  //   });
 });
 
 router.post("/facebook", async (req, res) => {
