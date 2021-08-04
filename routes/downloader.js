@@ -1,5 +1,5 @@
 const request = require("request");
-const axios = require("axios");
+const axios = require('axios');
 
 const router = require("express").Router();
 const youtubeDl = require("youtube-dl");
@@ -22,13 +22,13 @@ router.post("/instagram", (req, res) => {
 
   const url = `https://www.instagram.com/p/${ig_code}/?__a=1`;
 
-  request(url, { json: true, url }, (err, response, body) => {
+  request(url, { json: true ,url},(err, response, body) => {
     if (err) {
       res.json({ status: "error", details: "Error on getting response" });
 
       res.end();
     } else {
-      console.log(response);
+		console.log(response);
       let json = JSON.parse(response.body);
 
       if (json.hasOwnProperty("graphql")) {
@@ -303,47 +303,79 @@ router.post("/youtube-playlist", (req, res) => {
   });
 });
 
-router.post("/tiktok", async (req, res) => {
+router.post("/tiktok",  (req, res) => {
   const url = req.body.url;
+  let resss = new Promise((resolve, reject) => {
+    tiktokScraper
+      .getVideoMeta(url)
+      .then((response) => {
+        // Store the headers for downloading the video
+        const { headers, collector } = response;
 
-  try {
-    let response = await tiktokScraper.getVideoMeta(url);
+        const {
+          authorMeta,
+          text: description,
+          imageUrl: thumbnail,
+          videoUrl: urlDownload,
+          videoMeta,
+        } = collector[0];
+        const {
+          name: username,
+          nickName: name,
+          avatar: profilePic,
+        } = authorMeta;
 
-    const { headers, collector } = response;
+        const { ratio: format } = videoMeta;
 
-    const {
-      authorMeta,
-      text: description,
-      imageUrl: thumbnail,
-      videoUrl: urlDownload,
-      videoMeta,
-    } = collector[0];
-    const { name: username, nickName: name, avatar: profilePic } = authorMeta;
+        let returnInfo = {
+          status: "success",
+          headers,
+          username,
+          name,
+          profilePic,
+          description,
+          thumbnail,
+          format,
+          urlDownload,
+        };
+        // Resolve the promise with the information
+        resolve(returnInfo);
 
-    const { ratio: format } = videoMeta;
+        //   // Store data about the video
+        //   returnInfo = response.collector[0];
+        //   returnInfo.videoPath = path.join(basePath, `${videoID}.mp4`);
 
-    let returnInfo = {
-      status: "success",
-      headers,
-      username,
-      name,
-      profilePic,
-      description,
-      thumbnail,
-      format,
-      urlDownload,
-    };
+        //   // Shorten the numbers
+        //   returnInfo.playCount = shortNum(returnInfo.playCount);
+        //   returnInfo.diggCount = shortNum(returnInfo.diggCount);
+        //   returnInfo.shareCount = shortNum(returnInfo.shareCount);
+        //   returnInfo.commentCount = shortNum(returnInfo.commentCount);
 
-    res.json(returnInfo);
-    res.end();
-  } catch (error) {
-    res.json({
-      status: "error",
-      details: "Failed, Please check the URL!",
-      error,
+        // log.info('📲 - Downloading...', { serverID: guildID })
+      })
+      .catch((err) => {
+        // Reject with the
+        res.json({
+          status: "error",
+          details: "Failed, Please check the URL!",
+          err
+        });
+        res.end();
+        reject(err);
+      });
+  })
+    .then((value) => {
+      res.json(value);
+      res.end();
+    })
+    .catch((err) => {
+      res.json({
+        status: "error",
+        details: "Failed, Please check the URL!",
+        err
+      });
+      res.end();
     });
-    res.end();
-  }
 });
 
 router.post("/facebook", async (req, res) => {
@@ -436,5 +468,6 @@ router.post("/dailymotion", (req, res) => {
     }
   });
 });
+
 
 module.exports = router;
