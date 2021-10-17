@@ -6,4 +6,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use("/api", downloader);
 
-app.listen(2020);
+let port = 2020;
+
+console.log(`Listen Port: ${port}`);
+app.listen(port);

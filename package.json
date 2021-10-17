@@ -12,10 +12,12 @@
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
+    "https-proxy-agent": "^5.0.0",
     "nodemon": "^2.0.6",
     "request": "^2.88.2",
     "tiktok-downloader": "0.0.4",
-    "tiktok-scraper": "^1.4.33",
-    "youtube-dl": "^3.0.2"
+    "tiktok-scraper": "1.4.33",
+    "youtube-dl": "3.0.2",
+    "youtube-dl-exec": "^1.2.4"
   }
 }

@@ -1,5 +1,6 @@
 const request = require("request");
 const axios = require("axios");
+const tiktok = require("../libs/tiktok");
 
 const router = require("express").Router();
 const youtubeDl = require("youtube-dl");
@@ -306,115 +307,74 @@ router.post("/youtube-playlist", (req, res) => {
 router.post("/tiktok", async (req, res) => {
   const url = req.body.url;
 
-  var somevar = false;
-  var PTest = function () {
-    return new Promise(function (resolve, reject) {
-
-          tiktokScraper
-      .getVideoMeta(url).then(res1=> {
-
-        resolve(11);
-      }).catch(err=> {reject(err);})
-    
-       
-    });
-  };
-  var myfunc = PTest();
-  myfunc
-    .then(function (result) {
-      res.json(result);
-      console.log("Promise Resolved");
-    })
-    .catch(function () {
-      console.log("Promise Rejected");
-    });
   // try {
-  //   tiktokScraper
-  //     .getVideoMeta(url).then(res1=> {
-
-  //       console.log(res1);
-  //       res.json(res1);
-  //     })
-  // } catch (error) {
-  //        res.json({
-  //       status: "error",
-  //       details: "Failed, Please check the URL!",
-  //       error
-  //     });
-  //     res.end();
+  //   console.log("Start");
+  //   let response = [];
+  //   await tiktok.getVideoMeta(url).then((data) => {
+  //     console.log("Set Data");
+  //     response = data;
+  //   });
+  //   console.log(response);
+  // } catch (err) {
+  //   console.log(err);
   // }
 
-  // let resss = new Promise((resolve, reject) => {
-  //   tiktokScraper
-  //     .getVideoMeta(url)
-  //     .then((response) => {
-  //       // Store the headers for downloading the video
-  //       const { headers, collector } = response;
+  let resss = new Promise((resolve, reject) => {
+    tiktokScraper
+      .getVideoMeta(url)
+      .then((response) => {
+        // Store the headers for downloading the video
+        const { headers, collector } = response;
 
-  //       const {
-  //         authorMeta,
-  //         text: description,
-  //         imageUrl: thumbnail,
-  //         videoUrl: urlDownload,
-  //         videoMeta,
-  //       } = collector[0];
-  //       const {
-  //         name: username,
-  //         nickName: name,
-  //         avatar: profilePic,
-  //       } = authorMeta;
+        const {
+          authorMeta,
+          text: description,
+          imageUrl: thumbnail,
+          videoUrl: urlDownload,
+          videoMeta,
+        } = collector[0];
+        const {
+          name: username,
+          nickName: name,
+          avatar: profilePic,
+        } = authorMeta;
 
-  //       const { ratio: format } = videoMeta;
+        const { ratio: format } = videoMeta;
 
-  //       let returnInfo = {
-  //         status: "success",
-  //         headers,
-  //         username,
-  //         name,
-  //         profilePic,
-  //         description,
-  //         thumbnail,
-  //         format,
-  //         urlDownload,
-  //       };
-  //       // Resolve the promise with the information
-  //       resolve(returnInfo);
+        let returnInfo = {
+          status: "success",
+          headers,
+          username,
+          name,
+          profilePic,
+          description,
+          thumbnail,
+          format,
+          urlDownload,
+        };
+        // Resolve the promise with the information
+        resolve(returnInfo);
 
-  //       //   // Store data about the video
-  //       //   returnInfo = response.collector[0];
-  //       //   returnInfo.videoPath = path.join(basePath, `${videoID}.mp4`);
+        // log.info('📲 - Downloading...', { serverID: guildID })
+      })
+      .catch((err) => {
+        // Reject with the
 
-  //       //   // Shorten the numbers
-  //       //   returnInfo.playCount = shortNum(returnInfo.playCount);
-  //       //   returnInfo.diggCount = shortNum(returnInfo.diggCount);
-  //       //   returnInfo.shareCount = shortNum(returnInfo.shareCount);
-  //       //   returnInfo.commentCount = shortNum(returnInfo.commentCount);
-
-  //       // log.info('📲 - Downloading...', { serverID: guildID })
-  //     })
-  //     .catch((err) => {
-  //       // Reject with the
-  //       res.json({
-  //         status: "error",
-  //         details: "Failed, Please check the URL!",
-  //         err
-  //       });
-  //       res.end();
-  //       reject(err);
-  //     });
-  // })
-  //   .then((value) => {
-  //     res.json(value);
-  //     res.end();
-  //   })
-  //   .catch((err) => {
-  //     res.json({
-  //       status: "error",
-  //       details: "Failed, Please check the URL!",
-  //       err
-  //     });
-  //     res.end();
-  //   });
+        reject(err);
+      });
+  })
+    .then((value) => {
+      res.json(value);
+      res.end();
+    })
+    .catch((err) => {
+      res.json({
+        status: "error",
+        details: "Failed, Please check the URL!",
+        err,
+      });
+      res.end();
+    });
 });
 
 router.post("/facebook", async (req, res) => {
@@ -507,5 +467,85 @@ router.post("/dailymotion", (req, res) => {
     }
   });
 });
+
+router.post("/allin", (req, res) => {
+  const { url } = req.body;
+
+  const domain = domain_from_url(url);
+  let returnInfo = {};
+  switch (domain.toString().toUpperCase()) {
+    case "YOUTUBE.COM":
+      console.log(url);
+      returnInfo = youtubeGetLink(url);
+      console.log("returnInfo", returnInfo);
+      res.json(returnInfo);
+      res.end();
+      break;
+    case "PINTEREST.COM":
+      break;
+    default:
+      res.json({
+        status: "ERROR",
+        detail: "NO SUPPORT",
+      });
+      res.end();
+      break;
+  }
+});
+
+function domain_from_url(url) {
+  var result;
+  var match;
+  if (
+    (match = url.match(
+      /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im
+    ))
+  ) {
+    result = match[1];
+    if ((match = result.match(/^[^\.]+\.(.+\..+)$/))) {
+      result = match[1];
+    }
+  }
+  return result;
+}
+function youtubeGetLink(url) {
+  youtubeDl.getInfo(url, (err, info) => {
+    console.log(url);
+    if (err) {
+      return {
+        status: "error",
+        detail: err,
+      };
+    } else {
+      const { _filename: filename, thumbnails, fulltitle: title } = info;
+
+      const thumbnail = thumbnails[0].url;
+
+      const dataDownloads = [];
+
+      for (const currentFormat of info.formats) {
+        const {
+          format_note: formatNote,
+          ext: extension,
+          url: urlDownload,
+        } = currentFormat;
+
+        dataDownloads.push({
+          formatNote,
+          extension,
+          urlDownload,
+        });
+      }
+
+      return {
+        status: "SUCCESS",
+        title,
+        thumbnail,
+        filename,
+        dataDownloads,
+      };
+    }
+  });
+}
 
 module.exports = router;
